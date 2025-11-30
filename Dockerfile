@@ -36,13 +36,20 @@ RUN \
     npm config set fetch-retry-mintimeout 15000 ; \
     npm ci --no-audit
 
-COPY --chown=node:node . .
+# Copy source code
+# Optimization: Copy packages and client first to cache frontend build
+COPY --chown=node:node packages ./packages
+COPY --chown=node:node client ./client
 
 RUN \
     # React client build
     NODE_OPTIONS="--max-old-space-size=2048" npm run frontend; \
     npm prune --production; \
     npm cache clean --force
+
+# Copy backend source (changes here won't trigger frontend rebuild)
+COPY --chown=node:node api ./api
+COPY --chown=node:node config ./config
 
 # Node API setup
 EXPOSE 3080

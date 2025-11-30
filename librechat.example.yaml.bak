@@ -223,21 +223,6 @@ endpoints:
   #   # (optional) Agent Capabilities available to all users. Omit the ones you wish to exclude. Defaults to list below.
   #   capabilities: ["execute_code", "file_search", "actions", "tools"]
   custom:
-    # Ollama - Local models via Ollama service
-    - name: 'Ollama'
-      apiKey: 'ollama'
-      baseURL: 'http://ollama:11434/v1'
-      models:
-        default:
-          - 'llama3.2:latest'
-          - 'llama3.1:8b'
-          - 'mistral:latest'
-          - 'codellama:latest'
-        fetch: true
-      titleConvo: true
-      titleModel: 'llama3.2:latest'
-      modelDisplayLabel: 'Ollama'
-      iconURL: 'https://ollama.ai/public/ollama.png'
     # Groq Example
     - name: 'groq'
       apiKey: '${GROQ_API_KEY}'

@@ -169,3 +169,8 @@ coordination/orchestration/*
 claude-flow
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
+AGENTS.md
+Dockerfile.local
+docker-compose.yml.bak
+Dockerfile.bak
+deploy-compose.yml.bak
