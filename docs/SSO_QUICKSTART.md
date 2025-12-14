@@ -25,16 +25,26 @@ cp .env.sso.example .env
 
 ### Step 3: Generate Secrets
 
+Run these commands to generate secure secrets:
+
 ```bash
-# Generate secure secrets
+# Generate JWT secret
 node -e "console.log('JWT_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
+
+# Generate JWT refresh secret
 node -e "console.log('JWT_REFRESH_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
+
+# Generate OpenID session secret
 node -e "console.log('OPENID_SESSION_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
+
+# Generate Keycloak admin password
 node -e "console.log('KEYCLOAK_ADMIN_PASSWORD=' + require('crypto').randomBytes(16).toString('hex'))"
+
+# Generate Keycloak database password
 node -e "console.log('KC_DB_PASSWORD=' + require('crypto').randomBytes(16).toString('hex'))"
 ```
 
-Copy these values into your `.env` file.
+Copy these generated values into your `.env` file, replacing the placeholder values.
 
 ### Step 4: Start Services
 
@@ -120,14 +130,14 @@ MONGO_URI=mongodb://mongodb:27017/LibreChat
 OPENID_CLIENT_ID=your-client-id
 OPENID_CLIENT_SECRET=your-client-secret
 OPENID_ISSUER=https://your-idp.com/realms/your-realm
-OPENID_SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+OPENID_SESSION_SECRET=generate-with-node-crypto-command
 OPENID_SCOPE="openid profile email"
 OPENID_CALLBACK_URL=/oauth/openid/callback
 OPENID_USE_PKCE=true
 
-# JWT Secrets
-JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
-JWT_REFRESH_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+# JWT Secrets (generate using: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+JWT_SECRET=generate-with-node-crypto-command
+JWT_REFRESH_SECRET=generate-with-node-crypto-command
 
 # Authentication
 ALLOW_SOCIAL_LOGIN=true

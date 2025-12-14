@@ -39,7 +39,15 @@ print_header() {
 
 # Generate a secure random string
 generate_secret() {
-    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+    # Check if node is available
+    if command -v node &> /dev/null; then
+        node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+    elif command -v openssl &> /dev/null; then
+        openssl rand -hex 32
+    else
+        print_error "Neither node nor openssl found. Please install one to generate secrets."
+        exit 1
+    fi
 }
 
 # Check if .env file exists
@@ -78,9 +86,12 @@ update_env_var() {
     local value=$2
     local env_file=${3:-.env}
     
+    # Escape special characters for sed
+    local escaped_value=$(printf '%s\n' "$value" | sed 's/[[\.*^$/]/\\&/g')
+    
     if grep -q "^${key}=" "$env_file"; then
-        # Update existing variable
-        sed -i.bak "s|^${key}=.*|${key}=${value}|" "$env_file" && rm "${env_file}.bak"
+        # Update existing variable - use @ as delimiter to avoid issues with /
+        sed -i.bak "s@^${key}=.*@${key}=${escaped_value}@" "$env_file" && rm "${env_file}.bak"
     else
         # Add new variable
         echo "${key}=${value}" >> "$env_file"
@@ -251,8 +262,11 @@ test_sso_config() {
         exit 1
     fi
     
-    # Source .env file
-    export $(cat .env | grep -v '^#' | xargs)
+    # Safely source .env file
+    set -a
+    # shellcheck disable=SC1091
+    source .env 2>/dev/null || true
+    set +a
     
     # Check required variables
     required_vars=("OPENID_ISSUER" "OPENID_CLIENT_ID" "OPENID_CLIENT_SECRET" "OPENID_SESSION_SECRET")
