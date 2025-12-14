@@ -123,6 +123,7 @@
 
 - 👥 **Multi-User & Secure Access**:
   - Multi-User, Secure Authentication with OAuth2, LDAP, & Email Login Support
+  - **[Single Sign-On (SSO)](docs/SSO_README.md)** - Comprehensive SSO with OpenID Connect, SAML, and integration with external services
   - Built-in Moderation, and Token spend tools
 
 - ⚙️ **Configuration & Deployment**:  
