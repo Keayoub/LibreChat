@@ -46,10 +46,20 @@ node -e "console.log('KC_DB_PASSWORD=' + require('crypto').randomBytes(16).toStr
 
 Copy these generated values into your `.env` file, replacing the placeholder values.
 
-### Step 4: Start Services
+### Step 4: Configure Docker Compose Override
+
+Create a `docker-compose.override.yml` file based on the example:
 
 ```bash
-docker compose -f docker-compose.sso.yml up -d
+cp docker-compose.override.yml.example docker-compose.override.yml
+```
+
+Edit the file and uncomment the SSO sections you need (see examples in the file).
+
+### Step 5: Start Services
+
+```bash
+docker compose up -d
 ```
 
 ### Step 5: Configure Keycloak
@@ -74,7 +84,7 @@ docker compose -f docker-compose.sso.yml up -d
 ### Step 6: Restart LibreChat
 
 ```bash
-docker compose -f docker-compose.sso.yml restart librechat-api
+docker compose restart api
 ```
 
 ### Step 7: Create a Test User

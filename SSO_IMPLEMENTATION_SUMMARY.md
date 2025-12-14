@@ -55,17 +55,17 @@ This document summarizes the comprehensive Single Sign-On (SSO) implementation a
 - Proper defaults for quick start
 - Security notes and best practices
 
-#### **docker-compose.sso.yml** (6,881 characters)
-- Ready-to-use Docker Compose configuration
-- Includes:
-  - LibreChat (API + Client)
-  - MongoDB
-  - Meilisearch
+#### **docker-compose.override.yml.example** (updated with SSO)
+- Updated Docker Compose override examples
+- Includes comprehensive SSO configuration sections:
+  - LibreChat SSO environment variables
   - Optional Keycloak + PostgreSQL
-  - Optional LiteLLM
-  - Optional OpenWebUI
+  - Optional LiteLLM with SSO
+  - Optional OpenWebUI with SSO
+  - Optional SIM Studio with SSO template
 - Proper networking configuration
 - Environment variable management
+- Easy to uncomment and customize
 
 ### 3. Automation Scripts
 
@@ -138,7 +138,7 @@ cd /path/to/LibreChat
 
 # 3. Follow prompts to configure
 # 4. Start services
-docker compose -f docker-compose.sso.yml up -d
+docker compose up -d
 ```
 
 ### For Existing Identity Provider
@@ -182,10 +182,11 @@ docker compose -f docker-compose.sso.yml up -d
 ### Essential Files
 ```
 LibreChat/
-├── .env.sso.example              # Environment variables template
-├── docker-compose.sso.yml        # Docker Compose with SSO
+├── .env.sso.example                      # Environment variables template
+├── docker-compose.yml                    # Base docker compose
+├── docker-compose.override.yml.example   # SSO configuration examples
 ├── scripts/
-│   └── setup-sso.sh             # Interactive setup script
+│   └── setup-sso.sh                     # Interactive setup script
 └── docs/
     ├── SSO_README.md            # Main SSO documentation hub
     ├── SSO_QUICKSTART.md        # Quick start guide
@@ -240,7 +241,7 @@ OPENID_ADMIN_ROLE_PARAMETER_PATH=realm_access.roles
 **Goal**: Centralized authentication for your team
 
 **Steps**:
-1. Set up Keycloak (included in docker-compose.sso.yml)
+1. Set up Keycloak (uncomment in docker-compose.override.yml)
 2. Create realm for your organization
 3. Add team members as users
 4. Configure LibreChat to use Keycloak
@@ -324,7 +325,7 @@ Ensure MongoDB has proper indexes and connection pooling configured.
    - Multi-service setup: [SSO_INTEGRATION_GUIDE.md](docs/SSO_INTEGRATION_GUIDE.md)
 
 3. **Deploy to your environment**
-   - Development: Use docker-compose.sso.yml
+   - Development: Use docker-compose.override.yml with SSO sections uncommented
    - Production: Follow production checklist in SSO_CONFIGURATION.md
 
 4. **Configure additional services**

@@ -54,14 +54,18 @@ The interactive script will guide you through the configuration process.
 ### Option 2: Docker Compose (All-in-One)
 
 ```bash
-# Copy example file
+# Copy example files
 cp .env.sso.example .env
+cp docker-compose.override.yml.example docker-compose.override.yml
 
 # Edit .env with your identity provider details
 nano .env
 
-# Start services (includes Keycloak)
-docker compose -f docker-compose.sso.yml up -d
+# Edit docker-compose.override.yml and uncomment the SSO sections
+nano docker-compose.override.yml
+
+# Start services (uses docker-compose.yml + docker-compose.override.yml)
+docker compose up -d
 ```
 
 ### Option 3: Manual Configuration
@@ -205,7 +209,7 @@ See [Troubleshooting Guide](./SSO_CONFIGURATION.md#troubleshooting) for more sol
 
 ### Files
 - **`.env.sso.example`** - Example environment file with SSO configuration
-- **`docker-compose.sso.yml`** - Docker Compose with SSO and identity provider
+- **`docker-compose.override.yml.example`** - Docker Compose override examples with SSO configuration
 - **`scripts/setup-sso.sh`** - Interactive setup script
 
 ## 🔒 Security Considerations
