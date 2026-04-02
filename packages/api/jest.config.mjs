@@ -26,6 +26,8 @@ export default {
   moduleNameMapper: {
     '^@src/(.*)$': '<rootDir>/src/$1',
     '~/(.*)': '<rootDir>/src/$1',
+    '^@librechat/data-schemas$': '<rootDir>/../data-schemas/src/index.ts',
+    '^@librechat/data-schemas/(.*)$': '<rootDir>/../data-schemas/src/$1',
   },
   // coverageThreshold: {
   //   global: {

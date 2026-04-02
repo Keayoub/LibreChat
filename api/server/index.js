@@ -186,6 +186,9 @@ const startServer = async () => {
   app.use('/api/tags', routes.tags);
   app.use('/api/mcp', routes.mcp);
 
+  /** SCIM 2.0 Provisioning — Bearer token authenticated, no JWT required */
+  app.use('/scim/v2', routes.scim);
+
   /** 404 for unmatched API routes */
   app.use('/api', apiNotFound);
 

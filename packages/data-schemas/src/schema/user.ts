@@ -149,6 +149,11 @@ const userSchema = new Schema<IUser>(
       type: String,
       sparse: true,
     },
+    /** Whether the user account is active. Set to false to immediately invalidate sessions (SCIM deprovisioning). */
+    active: {
+      type: Boolean,
+      default: true,
+    },
     tenantId: {
       type: String,
       index: true,

@@ -50,6 +50,8 @@ export interface IUser extends Document {
   updatedAt?: Date;
   /** Field for external source identification (for consistency with TPrincipal schema) */
   idOnTheSource?: string;
+  /** Whether the user account is active. SCIM deprovisioning sets this to false and clears sessions. */
+  active?: boolean;
   tenantId?: string;
   federatedTokens?: OIDCTokens;
   openidTokens?: OIDCTokens;
