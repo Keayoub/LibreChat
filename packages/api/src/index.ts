@@ -55,6 +55,8 @@ export * from './stream';
 export { memoryDiagnostics } from './utils/memory';
 /* SCIM 2.0 */
 export * from './scim';
+/* Projects */
+export * from './projects';
 /* types */
 export type * from './mcp/types';
 export type * from './flow/types';

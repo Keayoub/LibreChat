@@ -16,6 +16,7 @@ import {
 } from '~/hooks';
 import { useConversationsInfiniteQuery, useTitleGeneration } from '~/data-provider';
 import { Conversations } from '~/components/Conversations';
+import { ProjectsList } from '~/components/Projects';
 import SearchBar from '~/components/Nav/SearchBar';
 import { clearMessagesCache } from '~/utils';
 import store from '~/store';
@@ -149,6 +150,9 @@ const ConversationsSection = memo(() => {
         </div>
       )}
       <div className="flex min-h-0 flex-grow flex-col overflow-hidden">
+        <div className="px-1 pb-1">
+          <ProjectsList toggleNav={toggleNav} />
+        </div>
         <Conversations
           conversations={conversations}
           moveToTop={moveToTop}

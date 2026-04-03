@@ -29,6 +29,7 @@ export interface ConversationMethods {
       search?: string;
       sortBy?: string;
       sortDirection?: string;
+      projectId?: string;
     },
   ): Promise<{ conversations: IConversation[]; nextCursor: string | null }>;
   getConvosQueried(
@@ -253,6 +254,7 @@ export function createConversationMethods(
       search,
       sortBy = 'updatedAt',
       sortDirection = 'desc',
+      projectId,
     }: {
       cursor?: string | null;
       limit?: number;
@@ -261,11 +263,14 @@ export function createConversationMethods(
       search?: string;
       sortBy?: string;
       sortDirection?: string;
+      projectId?: string;
     } = {},
   ) {
     const Conversation = mongoose.models.Conversation as Model<IConversation>;
     const filters: FilterQuery<IConversation>[] = [{ user } as FilterQuery<IConversation>];
-    if (isArchived) {
+    if (projectId) {
+      filters.push({ projectId } as FilterQuery<IConversation>);
+    } else if (isArchived) {
       filters.push({ isArchived: true } as FilterQuery<IConversation>);
     } else {
       filters.push({

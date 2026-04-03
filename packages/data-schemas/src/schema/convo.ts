@@ -40,6 +40,10 @@ const convoSchema: Schema<IConversation> = new Schema(
       type: String,
       index: true,
     },
+    projectId: {
+      type: String,
+      index: true,
+    },
   },
   { timestamps: true },
 );

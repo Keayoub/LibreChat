@@ -185,6 +185,7 @@ const startServer = async () => {
 
   app.use('/api/tags', routes.tags);
   app.use('/api/mcp', routes.mcp);
+  app.use('/api/projects', routes.projects);
 
   /** SCIM 2.0 Provisioning — Bearer token authenticated, no JWT required */
   app.use('/scim/v2', routes.scim);

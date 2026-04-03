@@ -206,3 +206,49 @@ export type GraphTokenResponse = {
   expires_in: number;
   scope: string;
 };
+
+/* Projects */
+export type TProject = {
+  _id: string;
+  name: string;
+  description?: string;
+  instructions?: string;
+  color?: string;
+  icon?: string;
+  user: string;
+  tenantId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type CreateProjectRequest = {
+  name: string;
+  description?: string;
+  instructions?: string;
+  color?: string;
+  icon?: string;
+};
+
+export type UpdateProjectRequest = {
+  name?: string;
+  description?: string;
+  instructions?: string;
+  color?: string;
+  icon?: string;
+};
+
+export type ProjectListParams = {
+  cursor?: string;
+  limit?: number;
+};
+
+export type ProjectListResponse = {
+  projects: TProject[];
+  nextCursor: string | null;
+};
+
+export type ProjectConversationsResponse = {
+  conversations: MinimalConversation[];
+  nextCursor: string | null;
+};
+

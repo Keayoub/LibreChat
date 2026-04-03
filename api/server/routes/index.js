@@ -32,10 +32,12 @@ const keys = require('./keys');
 const user = require('./user');
 const mcp = require('./mcp');
 const scim = require('./scim');
+const projects = require('./projects');
 
 module.exports = {
   mcp,
   scim,
+  projects,
   auth,
   adminAuth,
   adminConfig,

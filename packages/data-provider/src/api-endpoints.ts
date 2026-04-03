@@ -440,3 +440,16 @@ export const getAllEffectivePermissions = (resourceType: ResourceType) =>
 // SharePoint Graph API Token
 export const graphToken = (scopes: string) =>
   `${BASE_URL}/api/auth/graph-token?scopes=${encodeURIComponent(scopes)}`;
+
+/* Projects */
+const projectsRoot = `${BASE_URL}/api/projects`;
+export const projects = (params?: { cursor?: string; limit?: number }) =>
+  `${projectsRoot}${params ? buildQuery(params as Record<string, unknown>) : ''}`;
+export const projectById = (id: string) => `${projectsRoot}/${encodeURIComponent(id)}`;
+export const projectConversations = (id: string, params?: { cursor?: string; limit?: number }) =>
+  `${projectsRoot}/${encodeURIComponent(id)}/conversations${params ? buildQuery(params as Record<string, unknown>) : ''}`;
+export const assignConversationToProject = (projectId: string, conversationId: string) =>
+  `${projectsRoot}/${encodeURIComponent(projectId)}/conversations/${encodeURIComponent(conversationId)}`;
+export const unassignConversationFromProject = (conversationId: string) =>
+  `${projectsRoot}/conversations/${encodeURIComponent(conversationId)}`;
+

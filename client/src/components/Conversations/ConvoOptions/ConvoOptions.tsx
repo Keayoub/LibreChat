@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { QueryKeys } from 'librechat-data-provider';
 import { useQueryClient } from '@tanstack/react-query';
 import { DropdownPopup, Spinner, useToastContext } from '@librechat/client';
-import { Ellipsis, Share2, CopyPlus, Archive, Pen, Trash } from 'lucide-react';
+import { Ellipsis, Share2, CopyPlus, Archive, Pen, Trash, FolderInput } from 'lucide-react';
 import type { MouseEvent } from 'react';
 import type { TMessage } from 'librechat-data-provider';
 import {
@@ -16,6 +16,7 @@ import {
 import { useLocalize, useNavigateToConvo, useNewConvo } from '~/hooks';
 import { NotificationSeverity } from '~/common';
 import { useChatContext } from '~/Providers';
+import { ProjectAssignDialog } from '~/components/Projects';
 import DeleteButton from './DeleteButton';
 import ShareButton from './ShareButton';
 import { cn } from '~/utils';
@@ -55,6 +56,7 @@ function ConvoOptions({
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [announcement, setAnnouncement] = useState('');
 
   const archiveConvoMutation = useArchiveConvoMutation();
@@ -213,6 +215,12 @@ function ConvoOptions({
         ),
       },
       {
+        label: localize('com_ui_move_to_project'),
+        onClick: () => setShowProjectDialog(true),
+        hideOnClick: false,
+        icon: <FolderInput className="icon-sm mr-2 text-text-primary" aria-hidden="true" />,
+      },
+      {
         label: localize('com_ui_archive'),
         onClick: handleArchiveClick,
         hideOnClick: false,
@@ -340,6 +348,13 @@ function ConvoOptions({
           showDeleteDialog={showDeleteDialog}
           conversationId={conversationId ?? ''}
           setShowDeleteDialog={setShowDeleteDialog}
+        />
+      )}
+      {showProjectDialog && conversationId && (
+        <ProjectAssignDialog
+          conversationId={conversationId}
+          open={showProjectDialog}
+          onOpenChange={setShowProjectDialog}
         />
       )}
     </>

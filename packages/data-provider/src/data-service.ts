@@ -918,6 +918,40 @@ export function updateMarketplacePermissions(
   return request.put(endpoints.updateMarketplacePermissions(variables.roleName), variables.updates);
 }
 
+/* Projects */
+
+export const listProjects = (params?: q.ProjectListParams): Promise<q.ProjectListResponse> =>
+  request.get(endpoints.projects(params));
+
+export const getProjectById = (id: string): Promise<q.TProject> =>
+  request.get(endpoints.projectById(id));
+
+export const createProject = (data: q.CreateProjectRequest): Promise<q.TProject> =>
+  request.post(endpoints.projects(), data);
+
+export const updateProject = (id: string, data: q.UpdateProjectRequest): Promise<q.TProject> =>
+  request.patch(endpoints.projectById(id), data);
+
+export const deleteProject = (id: string): Promise<{ message: string }> =>
+  request.delete(endpoints.projectById(id));
+
+export const listProjectConversations = (
+  projectId: string,
+  params?: { cursor?: string; limit?: number },
+): Promise<q.ProjectConversationsResponse> =>
+  request.get(endpoints.projectConversations(projectId, params));
+
+export const assignConversationToProject = (
+  projectId: string,
+  conversationId: string,
+): Promise<{ message: string }> =>
+  request.post(endpoints.assignConversationToProject(projectId, conversationId));
+
+export const unassignConversationFromProject = (
+  conversationId: string,
+): Promise<{ message: string }> =>
+  request.delete(endpoints.unassignConversationFromProject(conversationId));
+
 /* Tags */
 export function getConversationTags(): Promise<t.TConversationTagsResponse> {
   return request.get(endpoints.conversationTags());
