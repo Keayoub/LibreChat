@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   OGDialog,
   OGDialogTemplate,
@@ -43,6 +43,16 @@ export default function ProjectDialog({
   const [instructions, setInstructions] = useState(project?.instructions ?? '');
   const [color, setColor] = useState(project?.color ?? PRESET_COLORS[0]);
   const [icon, setIcon] = useState(project?.icon ?? '');
+
+  useEffect(() => {
+    if (open) {
+      setName(project?.name ?? '');
+      setDescription(project?.description ?? '');
+      setInstructions(project?.instructions ?? '');
+      setColor(project?.color ?? PRESET_COLORS[0]);
+      setIcon(project?.icon ?? '');
+    }
+  }, [open, project]);
 
   const createMutation = useCreateProjectMutation({
     onSuccess: () => {
