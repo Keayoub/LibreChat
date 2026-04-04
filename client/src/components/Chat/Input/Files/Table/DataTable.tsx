@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { v4 } from 'uuid';
 import { useSetRecoilState } from 'recoil';
 import {
   flexRender,
@@ -28,9 +29,11 @@ import {
   TableHeader,
   useMediaQuery,
 } from '@librechat/client';
+import { UploadIcon } from 'lucide-react';
 import type { TFile } from 'librechat-data-provider';
 import { ColumnVisibilityDropdown } from './ColumnVisibilityDropdown';
 import { useDeleteFilesFromTable } from '~/hooks/Files';
+import { useUploadFileMutation } from '~/data-provider';
 import { useLocalize, TranslationKeys } from '~/hooks';
 import { cn } from '~/utils';
 import store from '~/store';
@@ -58,8 +61,32 @@ type Style = {
 export default function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const localize = useLocalize();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
   const setFiles = useSetRecoilState(store.filesByIndex(0));
   const { deleteFiles } = useDeleteFilesFromTable(() => setIsDeleting(false));
+  const uploadMutation = useUploadFileMutation({
+    onSuccess: () => setIsUploading(false),
+    onError: () => setIsUploading(false),
+  });
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    setIsUploading(true);
+    const file_id = v4();
+    const formData = new FormData();
+    formData.append('file', file, encodeURIComponent(file.name));
+    formData.append('file_id', file_id);
+    formData.append('endpoint', '');
+    formData.append('message_file', 'true');
+    uploadMutation.mutate(formData);
+    if (uploadInputRef.current) {
+      uploadInputRef.current.value = '';
+    }
+  };
 
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -94,6 +121,25 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2 py-2 sm:gap-4 sm:py-4">
+        <input
+          ref={uploadInputRef}
+          type="file"
+          className="hidden"
+          onChange={handleUpload}
+        />
+        <Button
+          variant="outline"
+          onClick={() => uploadInputRef.current?.click()}
+          disabled={isUploading}
+          className={cn('min-w-[40px] transition-all duration-200', isSmallScreen && 'px-2 py-1')}
+        >
+          {isUploading ? (
+            <Spinner className="size-3.5 sm:size-4" />
+          ) : (
+            <UploadIcon className="size-3.5 sm:size-4" />
+          )}
+          {!isSmallScreen && <span className="ml-2">{localize('com_ui_upload_files')}</span>}
+        </Button>
         <Button
           variant="outline"
           onClick={() => {
