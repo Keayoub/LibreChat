@@ -309,6 +309,14 @@ export default function FavoritesList({
 
   return (
     <div className="mb-2 flex flex-col">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between rounded-lg px-1 py-2 text-xs font-bold text-text-secondary outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black dark:focus-visible:ring-white"
+        aria-label={localize('com_ui_pinned')}
+        disabled
+      >
+        <span className="select-none">{localize('com_ui_pinned')}</span>
+      </button>
       <div ref={listContainerRef} className="mt-1 flex flex-col gap-1">
         {/* Show skeletons for ALL items while agents are still loading */}
         {isAgentsLoading ? (

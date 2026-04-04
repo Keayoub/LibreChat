@@ -69,8 +69,9 @@ RUN npm run build
 
 # API setup (including client dist)
 FROM base-min AS api-build
-# Add `uv` for extended MCP support
-COPY --from=ghcr.io/astral-sh/uv:0.6.13 /uv /uvx /bin/
+# Add python3 + uv for extended MCP support
+RUN apk add --no-cache python3 py3-pip uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.5-python3.12-alpine /usr/local/bin/uv /usr/local/bin/uvx /bin/
 RUN uv --version
 WORKDIR /app
 # Install only production deps

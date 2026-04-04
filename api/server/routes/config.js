@@ -17,6 +17,7 @@ const publicSharedLinksEnabled =
   sharedLinksEnabled && isEnabled(process.env.ALLOW_SHARED_LINKS_PUBLIC);
 
 const sharePointFilePickerEnabled = isEnabled(process.env.ENABLE_SHAREPOINT_FILEPICKER);
+const disableProviderUpload = isEnabled(process.env.DISABLE_PROVIDER_UPLOAD);
 const openidReuseTokens = isEnabled(process.env.OPENID_REUSE_TOKENS);
 
 function isBirthday() {
@@ -75,6 +76,7 @@ function buildSharedPayload() {
     helpAndFaqURL: process.env.HELP_AND_FAQ_URL || 'https://librechat.ai',
     sharedLinksEnabled,
     publicSharedLinksEnabled,
+    disableProviderUpload,
     analyticsGtmId: process.env.ANALYTICS_GTM_ID,
     openidReuseTokens,
   };
@@ -160,6 +162,7 @@ router.get('/', async function (req, res) {
       bundlerURL: process.env.SANDPACK_BUNDLER_URL,
       staticBundlerURL: process.env.SANDPACK_STATIC_BUNDLER_URL,
       sharePointFilePickerEnabled,
+      disableProviderUpload,
       sharePointBaseUrl: process.env.SHAREPOINT_BASE_URL,
       sharePointPickerGraphScope: process.env.SHAREPOINT_PICKER_GRAPH_SCOPE,
       sharePointPickerSharePointScope: process.env.SHAREPOINT_PICKER_SHAREPOINT_SCOPE,

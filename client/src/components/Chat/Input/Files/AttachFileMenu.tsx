@@ -2,8 +2,8 @@ import React, { useRef, useState, useMemo } from 'react';
 import { useRecoilState } from 'recoil';
 import * as Ariakit from '@ariakit/react';
 import {
+  FileUp,
   FileSearch,
-  ImageUpIcon,
   FileType2Icon,
   FileImageIcon,
   TerminalSquareIcon,
@@ -96,6 +96,7 @@ const AttachFileMenu = ({
   const { agentsConfig } = useGetAgentsConfig();
   const { data: startupConfig } = useGetStartupConfig();
   const sharePointEnabled = startupConfig?.sharePointFilePickerEnabled;
+  const disableProviderUpload = startupConfig?.disableProviderUpload ?? false;
 
   const [isSharePointDialogOpen, setIsSharePointDialogOpen] = useState(false);
 
@@ -146,10 +147,24 @@ const AttachFileMenu = ({
       const isAzureWithResponsesApi =
         currentProvider === EModelEndpoint.azureOpenAI && useResponsesApi;
 
+      // Local upload is always available first
+      items.push({
+        label: localize('com_ui_upload_files'),
+        onClick: () => {
+          setToolResource(undefined);
+          onAction();
+        },
+        icon: <FileUp className="icon-md" />,
+      });
+
+      // Provider upload shown additionally when supported and not disabled
       if (
-        isDocumentSupportedProvider(endpointType) ||
-        isDocumentSupportedProvider(currentProvider) ||
-        isAzureWithResponsesApi
+        !disableProviderUpload &&
+        (
+          isDocumentSupportedProvider(endpointType) ||
+          isDocumentSupportedProvider(currentProvider) ||
+          isAzureWithResponsesApi
+        )
       ) {
         items.push({
           label: localize('com_ui_upload_provider'),
@@ -167,15 +182,6 @@ const AttachFileMenu = ({
             onAction(fileType);
           },
           icon: <FileImageIcon className="icon-md" />,
-        });
-      } else {
-        items.push({
-          label: localize('com_ui_upload_image_input'),
-          onClick: () => {
-            setToolResource(undefined);
-            onAction('image');
-          },
-          icon: <ImageUpIcon className="icon-md" />,
         });
       }
 
@@ -250,6 +256,7 @@ const AttachFileMenu = ({
     setToolResource,
     setEphemeralAgent,
     sharePointEnabled,
+    disableProviderUpload,
     codeAllowedByAgent,
     fileSearchAllowedByAgent,
     setIsSharePointDialogOpen,
