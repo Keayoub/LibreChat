@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
-import { ArrowUpLeft } from 'lucide-react';
+import { v4 } from 'uuid';
+import { ArrowUpLeft, UploadIcon } from 'lucide-react';
 import {
   Table,
   Button,
@@ -35,7 +36,7 @@ import type { TFile } from 'librechat-data-provider';
 import { MyFilesModal } from '~/components/Chat/Input/Files/MyFilesModal';
 import { useFileMapContext, useChatContext } from '~/Providers';
 import { useLocalize, useUpdateFiles } from '~/hooks';
-import { useGetFileConfig } from '~/data-provider';
+import { useGetFileConfig, useUploadFileMutation } from '~/data-provider';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -49,7 +50,28 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [{ pageIndex, pageSize }, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [showFilesModal, setShowFilesModal] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const manageFilesRef = useRef<HTMLButtonElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadMutation = useUploadFileMutation({
+    onSuccess: () => setIsUploading(false),
+    onError: () => setIsUploading(false),
+  });
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    const file_id = v4();
+    const formData = new FormData();
+    formData.append('file', file, encodeURIComponent(file.name));
+    formData.append('file_id', file_id);
+    formData.append('endpoint', '');
+    formData.append('message_file', 'true');
+    uploadMutation.mutate(formData);
+    if (uploadInputRef.current) uploadInputRef.current.value = '';
+  };
 
   const pagination = useMemo(
     () => ({
@@ -314,6 +336,18 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
       </div>
 
       <div className="space-y-2">
+        <input ref={uploadInputRef} type="file" className="hidden" onChange={handleUpload} />
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full"
+          onClick={() => uploadInputRef.current?.click()}
+          disabled={isUploading}
+          aria-label={localize('com_ui_upload_files')}
+        >
+          <UploadIcon className="h-4 w-4" aria-hidden="true" />
+          <span className="ml-2">{localize('com_ui_upload_files')}</span>
+        </Button>
         <Button
           ref={manageFilesRef}
           variant="outline"
