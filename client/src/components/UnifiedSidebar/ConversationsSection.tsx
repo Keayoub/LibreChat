@@ -150,7 +150,7 @@ const ConversationsSection = memo(() => {
         </div>
       )}
       <div className="flex min-h-0 flex-grow flex-col overflow-hidden">
-        <div className="px-1 pb-1">
+        <div className="px-1 pb-1 border-b border-border-light">
           <ProjectsList toggleNav={toggleNav} />
         </div>
         <Conversations

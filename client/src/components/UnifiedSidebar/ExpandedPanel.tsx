@@ -1,83 +1,16 @@
-import { memo, useCallback, lazy, Suspense } from 'react';
+import { memo, lazy, Suspense } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import Cookies from 'js-cookie';
 import { QueryKeys } from 'librechat-data-provider';
-import { Skeleton, Sidebar, Button, TooltipAnchor, NewChatIcon } from '@librechat/client';
+import { Skeleton, Sidebar, Button, NewChatIcon } from '@librechat/client';
 import type { NavLink } from '~/common';
 import { CLOSE_SIDEBAR_ID } from '~/components/Chat/Menus/OpenSidebar';
 import { useActivePanel, resolveActivePanel } from '~/Providers';
 import { useLocalize, useNewConvo } from '~/hooks';
-import { isRTLLanguage } from '~/utils/isRTLLanguage';
-import { getSpeechLocale } from '~/utils/getSpeechLocale';
 import { clearMessagesCache, cn } from '~/utils';
 import store from '~/store';
 
 const AccountSettings = lazy(() => import('~/components/Nav/AccountSettings'));
-
-/** Shows the label of the NEXT language (what clicking will switch TO) */
-const getNextLangLabel = (lang: string) => {
-  if (lang.startsWith('ar')) {
-    return 'Fr';
-  }
-  if (lang.startsWith('fr')) {
-    return 'En';
-  }
-  return 'ع';
-};
-
-const getNextLang = (lang: string) => {
-  if (lang.startsWith('ar')) {
-    return 'fr-FR';
-  }
-  if (lang.startsWith('fr')) {
-    return 'en-US';
-  }
-  return 'ar-EG';
-};
-
-const LanguageToggleButton = memo(function LanguageToggleButton() {
-  const [langcode, setLangcode] = useRecoilState(store.lang);
-  const [, setChatDirection] = useRecoilState(store.chatDirection);
-  const [, setLanguageSTT] = useRecoilState<string>(store.languageSTT);
-  const [, setLanguageTTS] = useRecoilState<string>(store.languageTTS);
-
-  const handleClick = useCallback(() => {
-    const next = getNextLang(langcode);
-    const direction = isRTLLanguage(next) ? 'RTL' : 'LTR';
-    const speechLocale = getSpeechLocale(next);
-    setChatDirection(direction);
-    setLanguageSTT(speechLocale);
-    setLanguageTTS(speechLocale);
-    requestAnimationFrame(() => {
-      document.documentElement.lang = next;
-      document.documentElement.dir = direction.toLowerCase();
-    });
-    setLangcode(next);
-    Cookies.set('lang', next, { expires: 365 });
-  }, [langcode, setLangcode, setChatDirection, setLanguageSTT, setLanguageTTS]);
-
-  const nextLangLabel = getNextLangLabel(langcode);
-  const nextLangName = langcode.startsWith('ar') ? 'Français' : langcode.startsWith('fr') ? 'English' : 'العربية';
-
-  return (
-    <TooltipAnchor
-      side="right"
-      description={nextLangName}
-      render={
-        <Button
-          size="icon"
-          variant="ghost"
-          aria-label={`Switch to ${nextLangName}`}
-          className="lang-toggle-btn h-9 w-9 rounded-lg text-xs"
-          onClick={handleClick}
-        >
-          {nextLangLabel}
-        </Button>
-      }
-    />
-  );
-});
 
 const NewChatButton = memo(function NewChatButton() {
   const localize = useLocalize();
@@ -237,7 +170,6 @@ function ExpandedPanel({
       </div>
 
       <div className="mt-auto flex flex-col gap-1">
-        <LanguageToggleButton />
         <Suspense fallback={<Skeleton className="h-9 w-9 rounded-lg" />}>
           <AccountSettings collapsed />
         </Suspense>
