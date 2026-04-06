@@ -61,28 +61,36 @@ type Style = {
 export default function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const localize = useLocalize();
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [pendingUploads, setPendingUploads] = useState(0);
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const setFiles = useSetRecoilState(store.filesByIndex(0));
   const { deleteFiles } = useDeleteFilesFromTable(() => setIsDeleting(false));
-  const uploadMutation = useUploadFileMutation({
-    onSuccess: () => setIsUploading(false),
-    onError: () => setIsUploading(false),
-  });
+  const uploadMutation = useUploadFileMutation();
+
+  const isUploading = pendingUploads > 0;
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) {
+    const selectedFiles = Array.from(e.target.files ?? []);
+    if (selectedFiles.length === 0) {
       return;
     }
-    setIsUploading(true);
-    const file_id = v4();
-    const formData = new FormData();
-    formData.append('file', file, encodeURIComponent(file.name));
-    formData.append('file_id', file_id);
-    formData.append('endpoint', '');
-    formData.append('message_file', 'true');
-    uploadMutation.mutate(formData);
+
+    setPendingUploads(selectedFiles.length);
+
+    selectedFiles.forEach((file) => {
+      const file_id = v4();
+      const formData = new FormData();
+      formData.append('file', file, encodeURIComponent(file.name));
+      formData.append('file_id', file_id);
+      formData.append('endpoint', '');
+      formData.append('message_file', 'true');
+      uploadMutation.mutate(formData, {
+        onSettled: () => {
+          setPendingUploads((prev) => Math.max(prev - 1, 0));
+        },
+      });
+    });
+
     if (uploadInputRef.current) {
       uploadInputRef.current.value = '';
     }
@@ -124,6 +132,7 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
         <input
           ref={uploadInputRef}
           type="file"
+          multiple
           className="hidden"
           onChange={handleUpload}
         />
@@ -138,7 +147,7 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
           ) : (
             <UploadIcon className="size-3.5 sm:size-4" />
           )}
-          {!isSmallScreen && <span className="ml-2">{localize('com_ui_upload_files')}</span>}
+          {!isSmallScreen && <span className="ms-2">{localize('com_ui_upload_files')}</span>}
         </Button>
         <Button
           variant="outline"
@@ -158,7 +167,7 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
           ) : (
             <TrashIcon className="size-3.5 text-red-400 sm:size-4" />
           )}
-          {!isSmallScreen && <span className="ml-2">{localize('com_ui_delete')}</span>}
+          {!isSmallScreen && <span className="ms-2">{localize('com_ui_delete')}</span>}
         </Button>
         <FilterInput
           inputId="files-filter"
@@ -242,7 +251,7 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
       </div>
 
       <div className="flex items-center justify-end gap-2 py-4">
-        <div className="ml-2 flex-1 truncate text-xs text-muted-foreground sm:ml-4 sm:text-sm">
+        <div className="ms-2 flex-1 truncate text-xs text-muted-foreground sm:ms-4 sm:text-sm">
           <span className="hidden sm:inline">
             {localize('com_files_number_selected', {
               0: `${table.getFilteredSelectedRowModel().rows.length}`,

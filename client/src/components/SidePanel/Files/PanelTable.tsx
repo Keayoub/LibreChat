@@ -4,6 +4,7 @@ import { ArrowUpLeft, UploadIcon } from 'lucide-react';
 import {
   Table,
   Button,
+  Spinner,
   TableRow,
   TableHead,
   TableBody,
@@ -50,26 +51,34 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [{ pageIndex, pageSize }, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [showFilesModal, setShowFilesModal] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [pendingUploads, setPendingUploads] = useState(0);
   const manageFilesRef = useRef<HTMLButtonElement>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
-  const uploadMutation = useUploadFileMutation({
-    onSuccess: () => setIsUploading(false),
-    onError: () => setIsUploading(false),
-  });
+  const uploadMutation = useUploadFileMutation();
+
+  const isUploading = pendingUploads > 0;
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setIsUploading(true);
-    const file_id = v4();
-    const formData = new FormData();
-    formData.append('file', file, encodeURIComponent(file.name));
-    formData.append('file_id', file_id);
-    formData.append('endpoint', '');
-    formData.append('message_file', 'true');
-    uploadMutation.mutate(formData);
+    const selectedFiles = Array.from(e.target.files ?? []);
+    if (selectedFiles.length === 0) return;
+
+    setPendingUploads(selectedFiles.length);
+
+    selectedFiles.forEach((file) => {
+      const file_id = v4();
+      const formData = new FormData();
+      formData.append('file', file, encodeURIComponent(file.name));
+      formData.append('file_id', file_id);
+      formData.append('endpoint', '');
+      formData.append('message_file', 'true');
+      uploadMutation.mutate(formData, {
+        onSettled: () => {
+          setPendingUploads((prev) => Math.max(prev - 1, 0));
+        },
+      });
+    });
+
     if (uploadInputRef.current) uploadInputRef.current.value = '';
   };
 
@@ -336,17 +345,22 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
       </div>
 
       <div className="space-y-2">
-        <input ref={uploadInputRef} type="file" className="hidden" onChange={handleUpload} />
+        <input ref={uploadInputRef} type="file" multiple className="hidden" onChange={handleUpload} />
         <Button
           variant="outline"
           size="sm"
           className="w-full"
           onClick={() => uploadInputRef.current?.click()}
           disabled={isUploading}
+          aria-busy={isUploading}
           aria-label={localize('com_ui_upload_files')}
         >
-          <UploadIcon className="h-4 w-4" aria-hidden="true" />
-          <span className="ml-2">{localize('com_ui_upload_files')}</span>
+          {isUploading ? (
+            <Spinner className="h-4 w-4" />
+          ) : (
+            <UploadIcon className="h-4 w-4" aria-hidden="true" />
+          )}
+          <span className="ms-2">{localize('com_ui_upload_files')}</span>
         </Button>
         <Button
           ref={manageFilesRef}
@@ -357,7 +371,7 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
           aria-label={localize('com_sidepanel_manage_files')}
         >
           <ArrowUpLeft className="h-4 w-4" aria-hidden="true" />
-          <span className="ml-2">{localize('com_sidepanel_manage_files')}</span>
+          <span className="ms-2">{localize('com_sidepanel_manage_files')}</span>
         </Button>
 
         <div
